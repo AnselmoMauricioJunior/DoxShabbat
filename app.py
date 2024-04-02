@@ -37,11 +37,12 @@ class YouTubeDownloader:
         self.data1 = sabado_proximo.strftime(f"%d de {nome_mes} %Y").upper()
         self.data2 = sabado_proximo.strftime(f"%d/%M/%Y")       
         self.data3 = sabado_proximo.strftime(f"%d de {nome_mes}").upper()
-        self.data4 = sabado_proximo.strftime(f"%-d de {nome_mes}").upper()
+        self.data4 = sabado_proximo.strftime(f"%d de {nome_mes}").lstrip('0').upper()
         self.data5 = sabado_proximo.strftime(f"%d {nome_mes} %Y").upper()
         return data_formatada
 
-    def search_video(self,video_title,tipo):       
+    def search_video(self,video_title,tipo): 
+        print(f"Consultando {tipo}")      
         data = {"context": 
                     { 
                      "client":{
@@ -59,6 +60,7 @@ class YouTubeDownloader:
             if "videoRenderer" in video:
                 title = video["videoRenderer"]["title"]["runs"][0]["text"]                
                 if self.data1.lower() in title.lower() or self.data2.lower() in title.lower() or self.data3.lower() in title.lower() or self.data4.lower() in title.lower() or self.data5.lower() in title.lower():              
+                    print(f"Encontrado: {title}")
                     videoId = video["videoRenderer"]["videoId"]
                     self.videos.append({"title": tipo, "url": f"https://www.youtube.com/watch?v={videoId}"})
                     break
@@ -72,7 +74,7 @@ class YouTubeDownloader:
                 yt = YouTube(video["url"])
                 stream = yt.streams.get_highest_resolution()
                 print(f"Baixando: {video['title']}")
-                stream.download(output_path="arquivos", filename=video["title"])
+                stream.download(output_path="arquivos", filename=video["title"]+".mp4")
                 print(f"{video['title']} baixado com sucesso!")
             except Exception as e:
                 print(f"Erro ao baixar {video['title']}: {e}")
