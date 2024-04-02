@@ -35,7 +35,7 @@ class YouTubeDownloader:
         nome_mes = meses[sabado_proximo.strftime("%B")]
         data_formatada = sabado_proximo.strftime(f"%d {nome_mes} %Y").upper()
         self.data1 = sabado_proximo.strftime(f"%d de {nome_mes} %Y").upper()
-        self.data2 = sabado_proximo.strftime(f"%d/%M/%Y")       
+        self.data2 = sabado_proximo.strftime(f"%d/%m/%Y")       
         self.data3 = sabado_proximo.strftime(f"%d de {nome_mes}").upper()
         self.data4 = sabado_proximo.strftime(f"%d de {nome_mes}").lstrip('0').upper()
         self.data5 = sabado_proximo.strftime(f"%d {nome_mes} %Y").upper()
