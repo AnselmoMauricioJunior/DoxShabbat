@@ -1,5 +1,6 @@
 import os
 import requests
+import time
 from datetime import datetime, timedelta
 from pytube import YouTube
 
@@ -8,7 +9,8 @@ class YouTubeDownloader:
         self.url_consulta_youtube = url_consulta_youtube
         self.videos = []
         video_title_informativo = "Informativo Mundial das Missões | "+self.get_data()
-        video_title_provai_e_vede = "PROVAI E VEDE"+self.get_data()
+        video_title_provai_e_vede = "PROVAI E VEDE "+self.get_data()
+        print(video_title_provai_e_vede)
         
         
         self.search_video(video_title_informativo,'Informativo')
@@ -39,6 +41,8 @@ class YouTubeDownloader:
         self.data3 = sabado_proximo.strftime(f"%d de {nome_mes}").upper()
         self.data4 = sabado_proximo.strftime(f"%d de {nome_mes}").lstrip('0').upper()
         self.data5 = sabado_proximo.strftime(f"%d {nome_mes} %Y").upper()
+        self.data6 = sabado_proximo.strftime(f"%d/%m")   
+        self.data7 = sabado_proximo.strftime(f"%d/%m").lstrip('0').upper()
         return data_formatada
 
     def search_video(self,video_title,tipo): 
@@ -59,7 +63,7 @@ class YouTubeDownloader:
         for video in lista_videos:
             if "videoRenderer" in video:
                 title = video["videoRenderer"]["title"]["runs"][0]["text"]                
-                if self.data1.lower() in title.lower() or self.data2.lower() in title.lower() or self.data3.lower() in title.lower() or self.data4.lower() in title.lower() or self.data5.lower() in title.lower():              
+                if self.data1.lower() in title.lower() or self.data2.lower() in title.lower() or self.data3.lower() in title.lower() or self.data4.lower() in title.lower() or self.data5.lower() in title.lower() or self.data6.lower() in title.lower()or self.data7.lower() in title.lower():              
                     print(f"Encontrado: {title}")
                     videoId = video["videoRenderer"]["videoId"]
                     self.videos.append({"title": tipo, "url": f"https://www.youtube.com/watch?v={videoId}"})
@@ -70,14 +74,31 @@ class YouTubeDownloader:
             os.makedirs("arquivos")
 
         for video in self.videos:
-            try:
-                yt = YouTube(video["url"])
-                stream = yt.streams.get_highest_resolution()
-                print(f"Baixando: {video['title']}")
-                stream.download(output_path="arquivos", filename=video["title"]+".mp4")
-                print(f"{video['title']} baixado com sucesso!")
-            except Exception as e:
-                print(f"Erro ao baixar {video['title']}: {e}")
+            attempt = 0
+            while attempt < 3:
+                try:
+                    yt = YouTube(video["url"])
+                    stream = yt.streams.get_highest_resolution()
+                    file_name = video["title"] + ".mp4"
+                    file_path = os.path.join("arquivos", file_name)
+                    
+                    # Verifica se o arquivo já existe
+                    if os.path.exists(file_path):
+                        os.remove(file_path)
+                        print(f"Arquivo existente removido: {file_name}")
+
+                    print(f"Tentativa {attempt + 1} de baixar: {video['title']}")
+                    stream.download(output_path="arquivos", filename=file_name)
+                    print(f"{video['title']} baixado com sucesso!")
+                    break
+                except Exception as e:
+                    print(f"Erro ao baixar {video['title']}: {e}")
+                    attempt += 1
+                    if attempt < 3:
+                        print(f"Tentativa {attempt + 1} de baixar em 5 segundos...")
+                        time.sleep(5)
+                    else:
+                        print(f"Excedido o n�mero m�ximo de tentativas para baixar {video['title']}.")
 
 
 url_consulta_youtube = "https://www.youtube.com/youtubei/v1/search"
