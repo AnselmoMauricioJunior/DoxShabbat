@@ -1,0 +1,14 @@
+# Ignorar o arquivo DoxShabbat.spec
+DoxShabbat.spec
+
+# Ignorar a pasta build/
+build/
+
+# Ignorar a pasta dist/
+dist/
+
+# Ignorar a pasta env/
+env/
+
+# Ignorar o arquivo seven.ico
+seven.ico
